@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>nexon</groupId>
+  <artifactId>nexon</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Nexon</name>
+  <description>A programming language to speed up app creation.</description>
+  <!-- <url>https://github.com/Summit-Technology-Academy</url> -->
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <javafx.version>21.0.1</javafx.version>
+    <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.javaparser</groupId>
+      <artifactId>javaparser-symbol-solver-core</artifactId>
+      <version>3.27.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.spotify.fmt</groupId>
+      <artifactId>fmt-maven-plugin</artifactId>
+      <version>2.24</version>
+      <type>maven-plugin</type>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.4</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- To define the plugin version in your parent POM -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.6.0</version>
+          <configuration>
+            <configLocation>google_checks.xml</configLocation>
+            <violationSeverity>error</violationSeverity>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.21.0</version>
+          <configuration>
+            <outputDirectory>${project.basedir}/docs</outputDirectory>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <!-- To use the plugin goals in your POM or parent POM -->
+    <plugins>
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>${javafx.maven.plugin.version}</version>
+        <configuration>
+          <mainClass>org.lsr7.sta.jf25.javafx.App</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.spotify.fmt</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+        <version>2.24</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.1.0</version> <!-- Use a recent version -->
+          <configuration>
+              <mainClass>nexon.Main</mainClass> <!-- Replace with your fully qualified main class name -->
+                <arguments>
+                    <argument>read</argument>
+                    <argument>help.txt</argument>
+                    <!-- Add more arguments as needed -->
+                </arguments>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.8.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.6.0</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>checkstyle</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.5.2</version>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
