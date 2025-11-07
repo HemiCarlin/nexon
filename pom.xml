@@ -20,58 +20,13 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-controls</artifactId>
-      <version>${javafx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-fxml</artifactId>
-      <version>${javafx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.javaparser</groupId>
-      <artifactId>javaparser-symbol-solver-core</artifactId>
-      <version>3.27.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.spotify.fmt</groupId>
-      <artifactId>fmt-maven-plugin</artifactId>
-      <version>2.24</version>
-      <type>maven-plugin</type>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>5.11.4</version>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>4.6.0.201612231935-r</version>
     </dependency>
   </dependencies>
 
   <build>
-    <!-- To define the plugin version in your parent POM -->
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.6.0</version>
-          <configuration>
-            <configLocation>google_checks.xml</configLocation>
-            <violationSeverity>error</violationSeverity>
-            <consoleOutput>true</consoleOutput>
-            <failsOnError>true</failsOnError>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.21.0</version>
-          <configuration>
-            <outputDirectory>${project.basedir}/docs</outputDirectory>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <!-- To use the plugin goals in your POM or parent POM -->
     <plugins>
       <plugin>
@@ -82,63 +37,14 @@
           <mainClass>org.lsr7.sta.jf25.javafx.App</mainClass>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.spotify.fmt</groupId>
-        <artifactId>fmt-maven-plugin</artifactId>
-        <version>2.24</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
+      <!-- <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.13.0</version>
         <configuration>
           <release>${maven.compiler.release}</release>
         </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>3.1.0</version> <!-- Use a recent version -->
-          <configuration>
-              <mainClass>nexon.Main</mainClass> <!-- Replace with your fully qualified main class name -->
-                <arguments>
-                    <argument>read</argument>
-                    <argument>help.txt</argument>
-                    <!-- Add more arguments as needed -->
-                </arguments>
-          </configuration>
-      </plugin>
+      </plugin> -->
     </plugins>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.8.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.6.0</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>checkstyle</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.5.2</version>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>

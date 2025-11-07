@@ -18,3 +18,9 @@ public class hate extends JFrame {
         setVisible(true)
     }
 }
+
+class hello {
+    public hello() {
+
+    }
+}
