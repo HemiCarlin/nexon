@@ -8,6 +8,9 @@ public final class Compiler {
 
     private static final List<String> imports = new ArrayList<>();
 
+    /**
+     * Entry point: reads and compiles a source file, creating .java files for each public class.
+     */
     public static void readFile(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             List<String> classBuffer = new ArrayList<>();
@@ -17,18 +20,27 @@ public final class Compiler {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.strip();
-
                 if (line.isEmpty()) continue;
 
-                // Capture imports globally
+                // --- Handle imports ---
                 if (line.startsWith("import ")) {
                     imports.add(line);
                     continue;
                 }
 
-                // Detect public class
+                // --- Handle file includes ---
+                if (line.startsWith("fil ")) {
+                    String includedFile = extractFileName(line);
+                    if (includedFile != null) {
+                        System.out.println("Including file: " + includedFile);
+                        readFile(includedFile); // recursive include
+                    }
+                    continue;
+                }
+
+                // --- Detect new public class ---
                 if (line.startsWith("public class ")) {
-                    // If already inside a class, write it to file first
+                    // Write previous class (if any)
                     if (insideClass && currentClassName != null) {
                         writeClassFile(currentClassName, classBuffer);
                         classBuffer.clear();
@@ -40,13 +52,13 @@ public final class Compiler {
                     continue;
                 }
 
-                // Collect lines for the current class
+                // --- Collect lines for the current class ---
                 if (insideClass) {
                     classBuffer.add(line);
                 }
             }
 
-            // Write last class if one remains
+            // Write last class if still open
             if (insideClass && currentClassName != null) {
                 writeClassFile(currentClassName, classBuffer);
             }
@@ -56,6 +68,9 @@ public final class Compiler {
         }
     }
 
+    /**
+     * Extracts a class name from a 'public class ClassName' line.
+     */
     private static String extractClassName(String line) {
         String[] parts = line.split("\\s+");
         for (int i = 0; i < parts.length - 1; i++) {
@@ -66,6 +81,22 @@ public final class Compiler {
         return "UnknownClass";
     }
 
+    /**
+     * Extracts the filename from a line like: fil "file.txt"
+     */
+    private static String extractFileName(String line) {
+        int firstQuote = line.indexOf('"');
+        int lastQuote = line.lastIndexOf('"');
+        if (firstQuote != -1 && lastQuote > firstQuote) {
+            return line.substring(firstQuote + 1, lastQuote);
+        }
+        System.err.println("Invalid file include syntax: " + line);
+        return null;
+    }
+
+    /**
+     * Writes a list of lines to a .java file with its imports.
+     */
     private static void writeClassFile(String className, List<String> classLines) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(className + ".java"))) {
             // Write imports first
@@ -87,20 +118,22 @@ public final class Compiler {
         }
     }
 
+    /**
+     * Compiles and runs a Java class by name.
+     */
     public static void run(String className) throws IOException, InterruptedException {
         Command.excCommand("javac " + className + ".java");
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         Command.excCommand("java " + className);
     }
 
-    public static String modifyLine(String line) {
-        try {
-            if(line.lastIndexOf(';') == line.length() - 1) {
-                line += ";";
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
+    public static String modifyLine(String input) {
+        String output = input;
+        output = output.replace("main", "public static void main(String[] args)");
+        if (output.charAt(output.length() - 1) != ';' && output.charAt(output.length() - 1) != '{'
+                && output.charAt(output.length() - 1) != '}' && output.charAt(output.length() - 1) != ',') {
+            output = output + ";";
         }
-        return line;
+        return output;
     }
 }

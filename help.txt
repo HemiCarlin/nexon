@@ -1,7 +1,7 @@
 import javax.swing.JFrame;
 import java.util.Random;
 
-fil nope.txt
+fil "nope.txt"
 
 public class help {
     main {
