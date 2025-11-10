@@ -1,85 +1,106 @@
 package nexon;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public final class Compiler {
-    static String name = "";
-    static ArrayList<String> imports = new ArrayList<>();
 
-    static public void readFile(String filePath, boolean run) throws InterruptedException {
-        StringBuilder contentBuilder = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            name = filePath.split("\\.")[0];
-            String className = name;
+    private static final List<String> imports = new ArrayList<>();
+
+    public static void readFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            List<String> classBuffer = new ArrayList<>();
+            String currentClassName = null;
+            boolean insideClass = false;
+
             String line;
-
             while ((line = reader.readLine()) != null) {
-                contentBuilder.append(line).append(System.getProperty("line.separator"));
-                if (line.contains("import ")) {
+                line = line.strip();
+
+                if (line.isEmpty()) continue;
+
+                // Capture imports globally
+                if (line.startsWith("import ")) {
                     imports.add(line);
-                } else if (line.contains("fil")) {
-                    readFile(line.split("fil ")[1], false);
-                } else if (!line.equals("")) {
-                    className = newClass(line, className);
-                    line = modifyLine(line);
-                    // Command.excCommand("echo " + line + " >> " + className + ".java");
-                    writeToFile(line, className + ".java");
-                    Thread.sleep(200);
+                    continue;
+                }
+
+                // Detect public class
+                if (line.startsWith("public class ")) {
+                    // If already inside a class, write it to file first
+                    if (insideClass && currentClassName != null) {
+                        writeClassFile(currentClassName, classBuffer);
+                        classBuffer.clear();
+                    }
+
+                    insideClass = true;
+                    currentClassName = extractClassName(line);
+                    classBuffer.add(line);
+                    continue;
+                }
+
+                // Collect lines for the current class
+                if (insideClass) {
+                    classBuffer.add(line);
                 }
             }
-            reader.close();
-        } catch (Exception e) {
-            System.err.println("An error occurred while reading the file: " + e.getMessage());
-        }
-    }
 
-    public static String newClass(String input, String currentClass) throws Exception {
-        if (input.contains("class")) {
-            String subName = input.split("class")[1].split(" ")[1];
-            Command.excCommand("type nul > " + subName + ".java");
-            for (String a : imports) {
-                Command.excCommand("echo " + a + " >> " + subName + ".java");
-                writeToFile(a, subName + ".java");
+            // Write last class if one remains
+            if (insideClass && currentClassName != null) {
+                writeClassFile(currentClassName, classBuffer);
             }
-            Thread.sleep(200);
-            return subName;
-        }
-        Thread.sleep(200);
-        return currentClass;
-    }
 
-    public static String modifyLine(String input) {
-        String output = input;
-        output = output.replace("main", "public static void main(String[] args)");
-        if (output.charAt(output.length() - 1) != ';' && output.charAt(output.length() - 1) != '{'
-                && output.charAt(output.length() - 1) != '}' && output.charAt(output.length() - 1) != ',') {
-            output = output + ";";
-        }
-        return output;
-    }
-
-    public static void run(String file) throws IOException, InterruptedException {
-        Command.excCommand("javac " + file + ".java");
-        Thread.sleep(2000);
-        try {
-            Command.excCommand("java " + file);
-        } catch (Exception e) {
-            System.out.println("tried to run");
-        }
-
-    }
-
-    public static void writeToFile(String line, String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write(line);
         } catch (IOException e) {
-            System.err.println("An error occurred while writing to the file: " + e.getMessage());
+            System.err.println("Error reading file: " + e.getMessage());
         }
+    }
+
+    private static String extractClassName(String line) {
+        String[] parts = line.split("\\s+");
+        for (int i = 0; i < parts.length - 1; i++) {
+            if (parts[i].equals("class")) {
+                return parts[i + 1].replace("{", "").trim();
+            }
+        }
+        return "UnknownClass";
+    }
+
+    private static void writeClassFile(String className, List<String> classLines) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(className + ".java"))) {
+            // Write imports first
+            for (String imp : imports) {
+                writer.write(imp);
+                writer.newLine();
+            }
+            writer.newLine();
+
+            // Write class content
+            for (String line : classLines) {
+                writer.write(modifyLine(line));
+                writer.newLine();
+            }
+
+            System.out.println("Created file: " + className + ".java");
+        } catch (IOException e) {
+            System.err.println("Error writing " + className + ".java: " + e.getMessage());
+        }
+    }
+
+    public static void run(String className) throws IOException, InterruptedException {
+        Command.excCommand("javac " + className + ".java");
+        Thread.sleep(1000);
+        Command.excCommand("java " + className);
+    }
+
+    public static String modifyLine(String line) {
+        try {
+            if(line.lastIndexOf(';') == line.length() - 1) {
+                line += ";";
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return line;
     }
 }

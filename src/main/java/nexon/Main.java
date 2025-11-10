@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             if(args[0].equals("read")) {
-                Compiler.readFile(args[1], true);
+                Compiler.readFile(args[1]);
             } else if(args[0].equals("run")) {
                 Compiler.run(args[1]);
             } else if(args[0].equals("clean")) {
