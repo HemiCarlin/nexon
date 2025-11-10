@@ -1,7 +1,9 @@
 package nexon;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,7 +28,8 @@ public final class Compiler {
                 } else if (!line.equals("")) {
                     className = newClass(line, className);
                     line = modifyLine(line);
-                    Command.excCommand("echo " + line + " >> " + className + ".java");
+                    // Command.excCommand("echo " + line + " >> " + className + ".java");
+                    writeToFile(line, className + ".java");
                     Thread.sleep(200);
                 }
             }
@@ -42,6 +45,7 @@ public final class Compiler {
             Command.excCommand("type nul > " + subName + ".java");
             for (String a : imports) {
                 Command.excCommand("echo " + a + " >> " + subName + ".java");
+                writeToFile(a, subName + ".java");
             }
             Thread.sleep(200);
             return subName;
@@ -69,5 +73,13 @@ public final class Compiler {
             System.out.println("tried to run");
         }
 
+    }
+
+    public static void writeToFile(String line, String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write(line);
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing to the file: " + e.getMessage());
+        }
     }
 }
